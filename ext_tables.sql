@@ -81,7 +81,7 @@ CREATE TABLE sys_dmail (
   return_path varchar(80) DEFAULT '' NOT NULL,
   use_domain int(11) unsigned DEFAULT '0' NOT NULL,
   use_rdct tinyint(4) unsigned DEFAULT '0' NOT NULL,
-  long_link_rdct_url varchar(80) DEFAULT '' NOT NULL,
+  long_link_rdct_url varchar(2048) DEFAULT '' NOT NULL,
   long_link_mode tinyint(4) unsigned DEFAULT '0' NOT NULL,
   authcode_fieldList varchar(80) DEFAULT '' NOT NULL,
   recipientGroups varchar(80) DEFAULT '' NOT NULL,
