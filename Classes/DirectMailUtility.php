@@ -1511,13 +1511,19 @@ class DirectMailUtility
     public static function initializeTsfe(int $pageId, int $language = 0, bool $useCache = true): void
     {
         // resetting, a TSFE instance with data from a different page Id could be set already
-        $defaultLanguage = $GLOBALS['TYPO3_REQUEST']->getAttribute('site')->getLanguages()[0];
         unset($GLOBALS['TSFE']);
 
         $cacheId = $pageId . '|' . $language;
 
         if (!isset($tsfeCache[$cacheId]) || !$useCache) {
-            $GLOBALS['TSFE'] = GeneralUtility::makeInstance(TypoScriptFrontendController::class, $GLOBALS['TYPO3_CONF_VARS'], $pageId, $defaultLanguage);
+            $versionInformation = GeneralUtility::makeInstance(\TYPO3\CMS\Core\Information\Typo3Version::class);
+            if ($versionInformation->getMajorVersion() === 10) {
+                $defaultLanguage = $GLOBALS['TYPO3_REQUEST']->getAttribute('site')->getLanguages()[0];
+                $GLOBALS['TSFE'] = GeneralUtility::makeInstance(TypoScriptFrontendController::class, $GLOBALS['TYPO3_CONF_VARS'], $pageId, $defaultLanguage);
+            } else {
+                $GLOBALS['TSFE'] = GeneralUtility::makeInstance(TypoScriptFrontendController::class, $GLOBALS['TYPO3_CONF_VARS'], $pageId, 0);
+            }
+            
 
             // for certain situations we need to trick TSFE into granting us
             // access to the page in any case to make getPageAndRootline() work
