@@ -26,20 +26,6 @@ TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addLLrefForTCAdescr('_MOD_Dir
 TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addLLrefForTCAdescr('_MOD_web_DirectMailNavFrame', 'EXT:direct_mail/Resources/Private/Language/locallang_csh_web_txdirectmail.xlf');
 
 if (TYPO3_MODE == 'BE') {
-    // add module before 'Help'
-    if (!isset($TBE_MODULES['DirectMailNavFrame'])) {
-        $temp_TBE_MODULES = [];
-        foreach ($TBE_MODULES as $key => $val) {
-            if ($key == 'help') {
-                $temp_TBE_MODULES['DirectMailNavFrame'] = '';
-                $temp_TBE_MODULES[$key] = $val;
-            } else {
-                $temp_TBE_MODULES[$key] = $val;
-            }
-        }
-
-        $TBE_MODULES = $temp_TBE_MODULES;
-    }
 
     TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addModule(
         'DirectMailNavFrame',
