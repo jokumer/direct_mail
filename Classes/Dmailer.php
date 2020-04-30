@@ -44,7 +44,6 @@ class Dmailer implements LoggerAwareInterface
      */
     public $sendPerCycle = 50;
 
-    public $massend_id_lists = array();
     public $mailHasContent;
     public $flag_html = 0;
     public $flag_plain = 0;
@@ -55,12 +54,14 @@ class Dmailer implements LoggerAwareInterface
 
     /*
      * @var string
+     * Todo: need this in swift?
      */
     public $charset = '';
 
     /*
      * @var string
-     * Todo: Symfony mailer does not have an encoding you can change. Check if this has side effects
+     * Todo: need this in swift? Symfony mailer does not have an encoding you can change. Check if this has side effects
+
      */
     public $encoding = '';
 
@@ -358,7 +359,6 @@ class Dmailer implements LoggerAwareInterface
             if (GeneralUtility::validEmail($recipRow['email'])) {
                 $email = $recipRow['email'];
                 $name = $this->ensureCorrectEncoding($recipRow['name']);
-
                 $recipient = $this->createRecipient($email, $name);
             }
 
@@ -873,7 +873,7 @@ class Dmailer implements LoggerAwareInterface
         }
 
         $idLeft = time() . '.' . uniqid();
-        $idRight = !empty($host) ? $host : 'symfony.generated';
+        $idRight = !empty($host) ? $host : 'auto.generated';
         $this->messageid = $idLeft . '@' . $idRight;
 
         // Default line break for Unix systems.
@@ -897,8 +897,9 @@ class Dmailer implements LoggerAwareInterface
     /**
      * Set the content from $this->theParts['html'] or $this->theParts['plain'] to the mailbody
      *
-     * @return void
      * @var MailMessage $mailer Mailer Object
+     *
+     * @return void
      */
     public function setContent(&$mailer)
     {
@@ -910,35 +911,66 @@ class Dmailer implements LoggerAwareInterface
             foreach ($this->theParts['html']['media'] as $media) {
                 // TODO: why are there table related tags here?
                 if (($media['tag'] === 'img' || $media['tag'] === 'table' || $media['tag'] === 'tr' || $media['tag'] === 'td') && !$media['use_jumpurl'] && !$media['do_not_embed']) {
-                    $fileContent = GeneralUtility::getUrl($media['absRef']);
+                    if (ini_get('allow_url_fopen')) {
+                        // SwiftMailer depends on allow_url_fopen in PHP
+                        $cid = $mailer->embed(\Swift_Image::fromPath($media['absRef']));
+                    } else {
+                        // If allow_url_fopen is deactivated
+                        // SwiftMailer depends on allow_url_fopen in PHP
+                        // To work around this, download the files using t3lib::getURL() to a temporary location.
+                        $fileContent = GeneralUtility::getUrl($media['absRef']);
+                        $tempFile = Environment::getPublicPath() . '/uploads/tx_directmail/' . basename($media['absRef']);
+                        GeneralUtility::writeFile($tempFile, $fileContent);
 
-                    // embed images using base64 encoding
-                    $cid = 'data:' . mime_content_type(basename($media['absRef']))
-                        . ';base64,' . base64_encode($fileContent);
+                        unset($fileContent);
+
+                        $cid = $mailer->embed(\Swift_Image::fromPath($tempFile));
+                        // Temporary files will be removed again after the mail was sent!
+                        $this->tempFileList[] = $tempFile;
+                    }
+
                     $this->theParts['html']['content'] = str_replace($media['subst_str'], $cid, $this->theParts['html']['content']);
-                    unset($fileContent);
                 }
             }
             // remove ` do_not_embed="1"` attributes
             $this->theParts['html']['content'] = str_replace(' do_not_embed="1"', '', $this->theParts['html']['content']);
         }
 
+        // TODO: multiple instance for each NL type? HTML+Plain or Plain only?
+        // http://groups.google.com/group/swiftmailer/browse_thread/thread/98041a123223e63d
+        // $mailer->attach($entity);
+
         // set the html content
+        $versionInformation = GeneralUtility::makeInstance(\TYPO3\CMS\Core\Information\Typo3Version::class);
         if ($this->theParts['html']) {
-            $mailer->html($this->theParts['html']['content']);
-        }
-        // set the plain content as alt part
-        if ($this->theParts['plain']) {
-            $mailer->text($this->theParts['plain']['content']);
+            if ($versionInformation->getMajorVersion() === 10) {
+                $mailer->html($this->theParts['html']['content']);
+            } else {
+                $mailer->setBody($this->theParts['html']['content'], 'text/html');
+            }
+            // set the plain content as alt part
+            if ($this->theParts['plain']) {
+                if ($versionInformation->getMajorVersion() === 10) {
+                    $mailer->text($this->theParts['plain']['content']);
+                } else {
+                    $mailer->addPart($this->theParts['plain']['content'], 'text/plain');
+                }
+            }
+        } elseif ($this->theParts['plain']) {
+            if ($versionInformation->getMajorVersion() === 10) {
+                $mailer->text($this->theParts['plain']['content']);
+            } else {
+                $mailer->setBody($this->theParts['plain']['content'], 'text/plain');
+            }
         }
 
-        // handle FAL attachments
+        // Handle FAL attachments
         if ((int)$this->dmailer['sys_dmail_rec']['attachment'] > 0) {
             $files = DirectMailUtility::getAttachments($this->dmailer['sys_dmail_rec']['uid']);
             /** @var FileReference $file */
             foreach ($files as $file) {
                 $filePath = Environment::getPublicPath() . '/' . $file->getPublicUrl();
-                $mailer->attachFromPath($filePath);
+                $mailer->attach(\Swift_Attachment::fromPath($filePath));
             }
         }
     }
@@ -946,8 +978,8 @@ class Dmailer implements LoggerAwareInterface
     /**
      * Send of the email using php mail function.
      *
-     * @param Address   $recipient The recipient to send the mail to
-     * @param array     $recipRow  Recipient's data array
+     * @param Address|string|array $recipient The recipient address object or array for swift. array($name => $mail)
+     * @param array $recipRow  Recipient's data array
      *
      * @return	void
      */
@@ -955,24 +987,20 @@ class Dmailer implements LoggerAwareInterface
     {
         /** @var MailMessage $mailer */
         $mailer = GeneralUtility::makeInstance(MailMessage::class);
-        $mailer
-            ->from(new Address($this->from_email, $this->from_name))
-            ->to($recipient)
-            ->subject($this->subject)
-            ->priority($this->priority);
+        $mailer->setFrom(array($this->from_email => $this->from_name));
+        $mailer->setSubject($this->subject);
+        $versionInformation = GeneralUtility::makeInstance(\TYPO3\CMS\Core\Information\Typo3Version::class);
+        if ($versionInformation->getMajorVersion() === 10) {
+            $mailer->priority($this->priority);
+        } else {
+            $mailer->setPriority($this->priority);
+        }
 
         if ($this->replyto_email) {
-            $mailer->replyTo(new Address($this->replyto_email, $this->replyto_name));
+            $mailer->setReplyTo(array($this->replyto_email => $this->replyto_name));
         } else {
-            $mailer->replyTo(new Address($this->from_email, $this->from_name));
+            $mailer->setReplyTo(array($this->from_email => $this->from_name));
         }
-
-        if (GeneralUtility::validEmail($this->dmailer['sys_dmail_rec']['return_path'])) {
-            $mailer->returnPath($this->dmailer['sys_dmail_rec']['return_path']);
-        }
-
-        // TODO: setContent should set the images (includeMedia) or add attachment
-        $this->setContent($mailer);
 
         // setting additional header
         // organization and TYPO3MID
@@ -1000,7 +1028,32 @@ class Dmailer implements LoggerAwareInterface
             }
         }
 
+        if (GeneralUtility::validEmail($this->dmailer['sys_dmail_rec']['return_path'])) {
+            $mailer->setReturnPath($this->dmailer['sys_dmail_rec']['return_path']);
+        }
+
+        // set the recipient
+        $versionInformation = GeneralUtility::makeInstance(\TYPO3\CMS\Core\Information\Typo3Version::class);
+        if ($versionInformation->getMajorVersion() === 10) {
+            $mailer->to($recipient);
+        } else {
+            $mailer->setTo($recipient);
+        }
+
+        // TODO: setContent should set the images (includeMedia) or add attachment
+        $this->setContent($mailer);
+
+        if ($this->encoding == 'base64') {
+            $mailer->setEncoder(\Swift_Encoding::getBase64Encoding());
+        }
+
+        if ($this->encoding == '8bit') {
+            $mailer->setEncoder(\Swift_Encoding::get8BitEncoding());
+        }
+
         $mailer->send();
+
+        // unset the mailer object
         unset($mailer);
 
         // Delete temporary files
@@ -1579,14 +1632,25 @@ class Dmailer implements LoggerAwareInterface
      *
      * @param string $email
      * @param string|NULL $name
-     * @return Address
+     * @return Address|array
      */
     protected function createRecipient($email, $name = NULL)
     {
-        if (!empty($name)) {
-            $recipient = new Address($email, $name);
+        $versionInformation = GeneralUtility::makeInstance(\TYPO3\CMS\Core\Information\Typo3Version::class);
+        if ($versionInformation->getMajorVersion() === 10) {
+            if (!empty($name)) {
+                $recipient = new Address($email, $name);
+            } else {
+                $recipient = new Address($email);
+            }
         } else {
-            $recipient = new Address($email);
+            if (!empty($name)) {
+                $recipient = [
+                    $email => $this->getCharsetConverter()->conv($name, $this->backendCharset, $this->charset),
+                ];
+            } else {
+                $recipient = [$email];
+            }
         }
 
         return $recipient;
