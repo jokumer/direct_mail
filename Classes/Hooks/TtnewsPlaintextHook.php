@@ -24,7 +24,7 @@ require_once('EXT:direct_mail/pi1/class.tx_directmail_pi1.php');
 
 /**
  * Generating plain text content of tt_news records for Direct Mails
- * Implements hook $TYPO3_CONF_VARS['EXTCONF']['tt_news']['extraCodesHook']
+ * Implements hook $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['tt_news']['extraCodesHook']
  *
  * @author		Stanislas Rolland <stanislas.rolland(arobas)fructifor.ca>
  *

@@ -29,55 +29,27 @@ foreach ($icons as $identifier => $options) {
 // Register hook for simulating a user group
 $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['tslib/class.tslib_fe.php']['determineId-PreProcessing']['direct_mail'] = 'DirectMailTeam\\DirectMail\\Hooks\TypoScriptFrontendController->simulateUsergroup';
 
-    // unserializing the configuration so we can use it here:
-$extConf = unserialize($_EXTCONF);
-
 /**
  * Language of the cron task:
  */
-$GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['direct_mail']['cron_language'] = $extConf['cron_language'] ? $extConf['cron_language'] : 'en';
+$GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['direct_mail']['cron_language'] = $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['direct_mail']['cron_language'] ?: 'en';
 
 /**
  * Number of messages sent per cycle of the cron task:
  */
-$GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['direct_mail']['sendPerCycle'] = $extConf['sendPerCycle'] ? $extConf['sendPerCycle'] : 50;
+$GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['direct_mail']['sendPerCycle'] = $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['direct_mail']['sendPerCycle'] ?: 50;
 
 /**
  * Default recipient field list:
  */
-$GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['direct_mail']['defaultRecipFields'] = 'uid,name,title,email,phone,www,address,company,city,zip,country,fax,firstname,first_name,last_name';
-
-/**
- * Additional DB fields of the recipient:
- */
-$GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['direct_mail']['addRecipFields'] = $extConf['addRecipFields'];
-
-/**
- * Admin email for sending the cronjob error message
- */
-$GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['direct_mail']['adminEmail'] = $extConf['adminEmail'];
-
-/**
- * Direct Mail send a notification every time a job starts or ends
- */
-$GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['direct_mail']['notificationJob'] = $extConf['notificationJob'];
-
-/**
- * Interval of the cronjob
- */
-$GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['direct_mail']['cronInt'] = $extConf['cronInt'];
-
-/**
- * Use HTTP to fetch contents
- */
-$GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['direct_mail']['UseHttpToFetch'] = $extConf['UseHttpToFetch'];
+$GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['direct_mail']['defaultRecipFields'] = 'uid,name,title,email,phone,www,address,company,city,zip,country,fax,firstname,first_name,last_name';
 
 /**
  * Enable the use of News plain text rendering hook:
  */
-if ($extConf['enablePlainTextNews']) {
+if ($GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['direct_mail']['enablePlainTextNews']) {
     // Register tt_news plain text processing hook
-    $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['tt_news']['extraCodesHook'][] = 'DirectMailTeam\\DirectMail\\Hooks\\TtnewsPlaintextHook';
+    $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['tt_news']['extraCodesHook'][] = 'DirectMailTeam\\DirectMail\\Hooks\\TtnewsPlaintextHook';
 }
 
 /**

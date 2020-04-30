@@ -18,7 +18,7 @@ cmd_finalmail
 .. container:: table-row
 
    Property
-         ``$GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['direct_mail']['mod2']['cmd_finalmail']``
+         ``$GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['direct_mail']['mod2']['cmd_finalmail']``
 
    Method
          ``cmd_finalmail``
@@ -34,7 +34,7 @@ cmd_stats
 .. container:: table-row
 
    Property
-         ``$GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['direct_mail']['mod4']['cmd_stats']``
+         ``$GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['direct_mail']['mod4']['cmd_stats']``
 
    Method
          ``cmd_stats_postProcess``
@@ -49,7 +49,7 @@ cmd_stats_linkResponses
 .. container:: table-row
 
    Property
-         ``$GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['direct_mail']['mod4']['cmd_stats_linkResponses']``
+         ``$GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['direct_mail']['mod4']['cmd_stats_linkResponses']``
 
    Method
          ``cmd_stats_linkResponses``
@@ -64,7 +64,7 @@ renderCType
 .. container:: table-row
 
    Property
-         ``$TYPO3_CONF_VARS['EXTCONF']['direct_mail']['renderCType']``
+         ``$GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['direct_mail']['renderCType']``
 
    Method
          ``renderPlainText``
@@ -113,7 +113,7 @@ cmd_displayImport
 .. container:: table-row
 
    Property
-         ``$GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['direct_mail/mod3/class.tx_directmail_recipient_list.php']['cmd_displayImport']``
+         ``$GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['direct_mail/mod3/class.tx_directmail_recipient_list.php']['cmd_displayImport']``
 
    Method
          ``cmd_displayImport``
@@ -129,7 +129,7 @@ doImport
 .. container:: table-row
 
    Property
-         ``$GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['direct_mail/mod3/class.tx_directmail_recipient_list.php']['doImport']``
+         ``$GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['direct_mail/mod3/class.tx_directmail_recipient_list.php']['doImport']``
 
    Method
          ``doImport``
@@ -167,8 +167,8 @@ cmd_compileMailGroup
 .. container:: table-row
 
    Property
-         ``$GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['direct_mail']['mod2']['cmd_compileMailGroup']``
-         ``$GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['direct_mail']['mod3']['cmd_compileMailGroup']``
+         ``$GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['direct_mail']['mod2']['cmd_compileMailGroup']``
+         ``$GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['direct_mail']['mod3']['cmd_compileMailGroup']``
 
    Data type
          ``cmd_compileMailGroup_postProcess``

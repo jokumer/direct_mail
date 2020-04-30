@@ -264,7 +264,7 @@ class MailerEngine extends BaseScriptClass
 
 
         // seconds
-        $cronInterval = $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['direct_mail']['cronInt'] * 60;
+        $cronInterval = $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['direct_mail']['cronInt'] * 60;
         $lastCronjobShouldBeNewThan = (time() - $cronInterval);
 
         $filename = Environment::getPublicPath() . '/typo3temp/tx_directmail_dmailer_log.txt';

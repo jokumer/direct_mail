@@ -585,8 +585,8 @@ class DirectMailUtility
             // overrides any existing value in the field
             $first = $lines[0];
             $fieldListArr = explode(',', $fieldList);
-            if ($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['direct_mail']['addRecipFields']) {
-                $fieldListArr = array_merge($fieldListArr, explode(',', $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['direct_mail']['addRecipFields']));
+            if ($GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['direct_mail']['addRecipFields']) {
+                $fieldListArr = array_merge($fieldListArr, explode(',', $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['direct_mail']['addRecipFields']));
             }
             $fieldName = 1;
             $fieldOrder = array();

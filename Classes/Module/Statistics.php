@@ -916,9 +916,9 @@ class Statistics extends BaseScriptClass
             /**
              * Hook for cmd_stats_linkResponses
              */
-            if (is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['direct_mail']['mod4']['cmd_stats_linkResponses'])) {
+            if (is_array($GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['direct_mail']['mod4']['cmd_stats_linkResponses'])) {
                 $hookObjectsArr = array();
-                foreach ($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['direct_mail']['mod4']['cmd_stats_linkResponses'] as $classRef) {
+                foreach ($GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['direct_mail']['mod4']['cmd_stats_linkResponses'] as $classRef) {
                     $hookObjectsArr[] = &GeneralUtility::makeInstance($classRef);
                 }
 
@@ -1442,9 +1442,9 @@ class Statistics extends BaseScriptClass
          * Hook for cmd_stats_postProcess
          * insert a link to open extended importer
          */
-        if (is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['direct_mail']['mod4']['cmd_stats'])) {
+        if (is_array($GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['direct_mail']['mod4']['cmd_stats'])) {
             $hookObjectsArr = array();
-            foreach ($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['direct_mail']['mod4']['cmd_stats'] as $classRef) {
+            foreach ($GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['direct_mail']['mod4']['cmd_stats'] as $classRef) {
                 $hookObjectsArr[] = &GeneralUtility::makeInstance($classRef);
             }
 
@@ -1604,7 +1604,7 @@ class Statistics extends BaseScriptClass
         $baseUrl = GeneralUtility::getIndpEnv('TYPO3_SITE_URL');
 
         # if fetching the newsletter using http, set the url to http here
-        if ($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['direct_mail']['UseHttpToFetch'] == 1) {
+        if ($GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['direct_mail']['UseHttpToFetch'] == 1) {
             $baseUrl = str_replace('https', 'http', $baseUrl);
         }
 

@@ -805,9 +805,9 @@ class Dmail extends BaseScriptClass
          */
         $hookSelectDisabled = '';
         $hookContents = '';
-        if (is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['direct_mail']['mod2']['cmd_finalmail'])) {
+        if (is_array($GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['direct_mail']['mod2']['cmd_finalmail'])) {
             $hookObjectsArr = array();
-            foreach ($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['direct_mail']['mod2']['cmd_finalmail'] as $classRef) {
+            foreach ($GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['direct_mail']['mod2']['cmd_finalmail'] as $classRef) {
                 $hookObjectsArr[] = &GeneralUtility::makeInstance($classRef);
             }
             foreach ($hookObjectsArr as $hookObj) {
@@ -1407,11 +1407,11 @@ class Dmail extends BaseScriptClass
          * Hook for cmd_compileMailGroup
          * manipulate the generated id_lists
          */
-        if (is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['direct_mail']['mod2']['cmd_compileMailGroup'])) {
+        if (is_array($GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['direct_mail']['mod2']['cmd_compileMailGroup'])) {
             $hookObjectsArr = array();
             $temporaryList = '';
 
-            foreach ($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['direct_mail']['mod2']['cmd_compileMailGroup'] as $classRef) {
+            foreach ($GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['direct_mail']['mod2']['cmd_compileMailGroup'] as $classRef) {
                 $hookObjectsArr[] = &GeneralUtility::makeInstance($classRef);
             }
             foreach ($hookObjectsArr as $hookObj) {

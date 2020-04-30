@@ -61,6 +61,23 @@ Breaking Changes
 
    /ABS/PATH/TO/BINARY/ direct_mail:invokemailerengine --help
 
+#. Hook registration: Configuration path changed
+
+   'EXTCONF' has been renamed to 'EXTENSIONS' which must be adopted.
+   fx mod3 recipient list import - doImport
+
+   from
+
+.. code-block:: php
+
+   $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['direct_mail/mod3/class.tx_directmail_recipient_list.php']['doImport']
+
+   to
+
+.. code-block:: php
+
+   $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['direct_mail/mod3/class.tx_directmail_recipient_list.php']['doImport']
+
 Deprecations
 """"""""""""
 

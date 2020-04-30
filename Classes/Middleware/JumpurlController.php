@@ -324,14 +324,14 @@ class JumpurlController implements MiddlewareInterface
     {
         $rowFieldsArray = explode(
             ',',
-            $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['direct_mail']['defaultRecipFields']
+            $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['direct_mail']['defaultRecipFields']
         );
-        if ($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['direct_mail']['addRecipFields']) {
+        if ($GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['direct_mail']['addRecipFields']) {
             $rowFieldsArray = array_merge(
                 $rowFieldsArray,
                 explode(
                     ',',
-                    $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['direct_mail']['addRecipFields']
+                    $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['direct_mail']['addRecipFields']
                 )
             );
         }

@@ -249,9 +249,9 @@ class Dmailer implements LoggerAwareInterface
         // replace %23%23%23 with ###, since typolink generated link with urlencode
         $content = str_replace('%23%23%23', '###', $content);
 
-        $rowFieldsArray = GeneralUtility::trimExplode(',', $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['direct_mail']['defaultRecipFields']);
-        if ($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['direct_mail']['addRecipFields']) {
-            $rowFieldsArray = array_merge($rowFieldsArray, GeneralUtility::trimExplode(',', $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['direct_mail']['addRecipFields']));
+        $rowFieldsArray = GeneralUtility::trimExplode(',', $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['direct_mail']['defaultRecipFields']);
+        if ($GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['direct_mail']['addRecipFields']) {
+            $rowFieldsArray = array_merge($rowFieldsArray, GeneralUtility::trimExplode(',', $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['direct_mail']['addRecipFields']));
         }
 
         foreach ($rowFieldsArray as $substField) {
@@ -688,7 +688,7 @@ class Dmailer implements LoggerAwareInterface
             if ($versionInformation->getMajorVersion() === 10) {
                 $mail->text($message);
             } else {
-            $mail->setBody($message);
+                $mail->setBody($message);
             }
             $mail->send();
         }
@@ -791,13 +791,13 @@ class Dmailer implements LoggerAwareInterface
      */
     public function runcron()
     {
-        $this->sendPerCycle = trim($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['direct_mail']['sendPerCycle']) ? intval($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['direct_mail']['sendPerCycle']) : 50;
-        $this->notificationJob = (bool)($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['direct_mail']['notificationJob']);
+        $this->sendPerCycle = trim($GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['direct_mail']['sendPerCycle']) ? intval($GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['direct_mail']['sendPerCycle']) : 50;
+        $this->notificationJob = (bool)($GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['direct_mail']['notificationJob']);
 
         if (!is_object($this->getLanguageService())) {
             /* @var $this->getLanguageService() \TYPO3\CMS\Lang\LanguageService */
             $GLOBALS['LANG'] = GeneralUtility::makeInstance('TYPO3\\CMS\\Lang\\LanguageService');
-            $language = $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['direct_mail']['cron_language'] ? $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['direct_mail']['cron_language'] : $this->user_dmailerLang;
+            $language = $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['direct_mail']['cron_language'] ? $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['direct_mail']['cron_language'] : $this->user_dmailerLang;
             $this->getLanguageService()->init(trim($language));
         }
 
@@ -1109,7 +1109,7 @@ class Dmailer implements LoggerAwareInterface
         $this->theParts['html']['content'] = GeneralUtility::getURL($url);
         if ($this->theParts['html']['content']) {
             $urlPart = parse_url($url);
-            if ($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['direct_mail']['UseHttpToFetch'] == 1) {
+            if ($GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['direct_mail']['UseHttpToFetch'] == 1) {
                 $urlPart['scheme'] = 'http';
             }
 

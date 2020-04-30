@@ -555,9 +555,9 @@ class Importer
          *  Hook for cmd_displayImport
          *  use it to manipulate the steps in the import process
          */
-        if (is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['direct_mail/mod3/class.tx_directmail_recipient_list.php']['cmd_displayImport'])) {
+        if (is_array($GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['direct_mail/mod3/class.tx_directmail_recipient_list.php']['cmd_displayImport'])) {
             $hookObjectsArr = array();
-            foreach ($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['direct_mail/mod3/class.tx_directmail_recipient_list.php']['cmd_displayImport'] as $classRef) {
+            foreach ($GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['direct_mail/mod3/class.tx_directmail_recipient_list.php']['cmd_displayImport'] as $classRef) {
                 $hookObjectsArr[] = &GeneralUtility::makeInstance($classRef);
             }
         }
@@ -792,9 +792,9 @@ class Importer
          * Hook for doImport Mail
          * will be called every time a record is inserted
          */
-        if (is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['direct_mail/mod3/class.tx_directmail_recipient_list.php']['doImport'])) {
+        if (is_array($GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['direct_mail/mod3/class.tx_directmail_recipient_list.php']['doImport'])) {
             $hookObjectsArr = array();
-            foreach ($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['direct_mail/mod3/class.tx_directmail_recipient_list.php']['doImport'] as $classRef) {
+            foreach ($GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['direct_mail/mod3/class.tx_directmail_recipient_list.php']['doImport'] as $classRef) {
                 $hookObjectsArr[] = &GeneralUtility::makeInstance($classRef);
             }
 
