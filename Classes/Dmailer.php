@@ -684,7 +684,12 @@ class Dmailer implements LoggerAwareInterface
                 $mail->setReplyTo($this->replyto_email);
             }
 
+            $versionInformation = GeneralUtility::makeInstance(\TYPO3\CMS\Core\Information\Typo3Version::class);
+            if ($versionInformation->getMajorVersion() === 10) {
+                $mail->text($message);
+            } else {
             $mail->setBody($message);
+            }
             $mail->send();
         }
     }
