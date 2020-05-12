@@ -173,21 +173,41 @@ class JumpurlController
             }
 
             if ($responseType != 0) {
+                $logTable = 'sys_dmail_maillog';
+                // check if entry exists in the last 10 seconds
+                $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable($logTable);
+                $existingLog = $queryBuilder
+                    ->count('*')
+                    ->from($logTable)
+                    ->where(
+                        $queryBuilder->expr()->eq('mid', $queryBuilder->createNamedParameter($mid, \PDO::PARAM_INT)),
+                        $queryBuilder->expr()->eq('url', $queryBuilder->createNamedParameter($jumpurl, \PDO::PARAM_STR)),
+                        $queryBuilder->expr()->eq('response_type', $queryBuilder->createNamedParameter($responseType, \PDO::PARAM_INT)),
+                        $queryBuilder->expr()->eq('url_id', $queryBuilder->createNamedParameter($urlId, \PDO::PARAM_INT)),
+                        $queryBuilder->expr()->eq('rtbl', $queryBuilder->createNamedParameter($recipientTable, \PDO::PARAM_STR)),
+                        $queryBuilder->expr()->eq('rid', $queryBuilder->createNamedParameter($recipientUid, \PDO::PARAM_INT)),
+                        $queryBuilder->expr()->lte('tstamp', $queryBuilder->createNamedParameter(time(), \PDO::PARAM_INT)),
+                        $queryBuilder->expr()->gte('tstamp', $queryBuilder->createNamedParameter(time()-10, \PDO::PARAM_INT))
+                    )
+                    ->execute()
+                    ->fetchColumn();
 
-                $connectionPool = GeneralUtility::makeInstance(ConnectionPool::class);
-                $databaseConnectionSysDamilMaillog = $connectionPool->getConnectionForTable('sys_dmail_maillog');
-                $databaseConnectionSysDamilMaillog->insert(
-                    'sys_dmail_maillog',
-                    [
-                        'mid'           => intval($mid),
-                        'tstamp'        => time(),
-                        'url'           => $jumpurl,
-                        'response_type' => intval($responseType),
-                        'url_id'        => intval($urlId),
-                        'rtbl'            => $recipientTable,
-                        'rid'            => $recipientUid
-                    ]
-                );
+                if ($existingLog === 0) {
+                    $connectionPool = GeneralUtility::makeInstance(ConnectionPool::class);
+                    $databaseConnectionSysDamilMaillog = $connectionPool->getConnectionForTable($logTable);
+                    $databaseConnectionSysDamilMaillog->insert(
+                        $logTable,
+                        [
+                            'mid'           => intval($mid),
+                            'tstamp'        => time(),
+                            'url'           => $jumpurl,
+                            'response_type' => intval($responseType),
+                            'url_id'        => intval($urlId),
+                            'rtbl'          => $recipientTable,
+                            'rid'           => $recipientUid
+                        ]
+                    );
+                }
             }
         }
 
