@@ -496,21 +496,18 @@ class DirectMailUtility
         if ($group['query']) {
             $queryGenerator->init('dmail_queryConfig', $table);
             $queryGenerator->queryConfig = $queryGenerator->cleanUpQueryConfig(unserialize($group['query']));
-            $whereClause = $queryGenerator->getQuery($queryGenerator->queryConfig);
 
-            $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable($table);
-            $queryBuilder
-                ->getRestrictions()
-                ->removeAll()
-                ->add(GeneralUtility::makeInstance(DeletedRestriction::class));
-            $res = $queryBuilder->select($table . '.uid')
-                ->from($table)
-                ->add('where', $whereClause)
-                ->execute();
+            $queryGenerator->extFieldLists['queryFields'] = 'uid';
+            $select = $queryGenerator->getSelectQuery();
+            $res = $GLOBALS['TYPO3_DB']->sql_query($select);
 
-            while ($row = $res->fetch()) {
-                $outArr[] = $row['uid'];
+            if ($GLOBALS['TYPO3_DB']->sql_num_rows($res) > 0) {
+                while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res)) {
+                    $outArr[] = $row['uid'];
+                }
             }
+
+            $GLOBALS['TYPO3_DB']->sql_free_result($res);
         }
         return $outArr;
     }
