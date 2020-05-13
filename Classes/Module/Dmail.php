@@ -331,9 +331,9 @@ class Dmail extends BaseScriptClass
             'replyto_email'        => $this->params['replyto_email'],
             'replyto_name'        => $this->params['replyto_name'],
             'return_path'        => $this->params['return_path'],
-            'priority'            => $this->params['priority'],
-            'use_rdct'            => $this->params['use_rdct'],
-            'long_link_mode'    => $this->params['long_link_mode'],
+            'priority'            => (int) $this->params['priority'],
+            'use_rdct'            => (int) $this->params['use_rdct'],
+            'long_link_mode'    => (int) $this->params['long_link_mode'],
             'organisation'        => $this->params['organisation'],
             'authcode_fieldList'=> $this->params['authcode_fieldList'],
             'plainParams'        => ''
