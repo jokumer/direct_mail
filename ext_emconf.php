@@ -38,6 +38,7 @@ $EM_CONF[$_EXTKEY] = [
             'php' => '7.2.0',
             'typo3' => '9.5.0-9.5.99',
             'rdct' => '1.0.0',
+            'jumpurl' => '7.8.0-7.8.99'
         ],
         'conflicts' => [
             'sr_direct_mail_ext' => '',
