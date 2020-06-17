@@ -130,9 +130,9 @@ class Dmailer implements LoggerAwareInterface
      * @var MarkerBasedTemplateService
      */
     protected $templateService;
-    
+
     protected $message = '';
-    
+
     protected $notificationJob = false;
 
     protected function getCharsetConverter()
@@ -679,7 +679,7 @@ class Dmailer implements LoggerAwareInterface
             $mail->setTo($this->from_email, $from_name);
             $mail->setFrom($this->from_email, $from_name);
             $mail->setSubject($subject);
-            
+
             if ($this->replyto_email !== '') {
                 $mail->setReplyTo($this->replyto_email);
             }
@@ -990,21 +990,30 @@ class Dmailer implements LoggerAwareInterface
      */
     public function sendTheMail($recipient, $recipRow = null)
     {
+        if ($this->replyto_email) {
+            $replyTo = ['mail'=> $this->replyto_email, 'name' => $this->replyto_name];
+        } else {
+            $replyTo = ['mail'=> $this->from_email, 'name' => $this->from_name];
+        }
         /** @var MailMessage $mailer */
         $mailer = GeneralUtility::makeInstance(MailMessage::class);
-        $mailer->setFrom(array($this->from_email => $this->from_name));
-        $mailer->setSubject($this->subject);
+
+
         $versionInformation = GeneralUtility::makeInstance(\TYPO3\CMS\Core\Information\Typo3Version::class);
         if ($versionInformation->getMajorVersion() === 10) {
+            $mailer->from(new Address($this->from_email, $this->from_name));
+            $mailer->subject($this->subject);
             $mailer->priority($this->priority);
+            $mailer->replyTo(new Address($replyTo['mail'], $replyTo['name']));
+            // set the recipient
+            $mailer->to(new Address($recipient->getAddress(), $recipient->getName()));
         } else {
+            $mailer->setFrom(array($this->from_email => $this->from_name));
+            $mailer->setSubject($this->subject);
             $mailer->setPriority($this->priority);
-        }
-
-        if ($this->replyto_email) {
-            $mailer->setReplyTo(array($this->replyto_email => $this->replyto_name));
-        } else {
-            $mailer->setReplyTo(array($this->from_email => $this->from_name));
+            $mailer->setReplyTo(array($replyTo['mail'] => $replyTo['name']));
+            // set the recipient
+            $mailer->setTo($recipient);
         }
 
         // setting additional header
@@ -1037,23 +1046,17 @@ class Dmailer implements LoggerAwareInterface
             $mailer->setReturnPath($this->dmailer['sys_dmail_rec']['return_path']);
         }
 
-        // set the recipient
-        $versionInformation = GeneralUtility::makeInstance(\TYPO3\CMS\Core\Information\Typo3Version::class);
-        if ($versionInformation->getMajorVersion() === 10) {
-            $mailer->to($recipient);
-        } else {
-            $mailer->setTo($recipient);
-        }
 
         // TODO: setContent should set the images (includeMedia) or add attachment
         $this->setContent($mailer);
 
-        if ($this->encoding == 'base64') {
-            $mailer->setEncoder(\Swift_Encoding::getBase64Encoding());
-        }
-
-        if ($this->encoding == '8bit') {
-            $mailer->setEncoder(\Swift_Encoding::get8BitEncoding());
+        if ($versionInformation->getMajorVersion() < 10) {
+            if ($this->encoding == 'base64') {
+                $mailer->setEncoder(\Swift_Encoding::getBase64Encoding());
+            }
+            if ($this->encoding == '8bit') {
+                $mailer->setEncoder(\Swift_Encoding::get8BitEncoding());
+            }
         }
 
         $mailer->send();

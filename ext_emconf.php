@@ -36,7 +36,7 @@ $EM_CONF['direct_mail'] = [
         'depends' => [
             'tt_address' => '',
             'php' => '7.2.0',
-            'typo3' => '9.5.0-9.5.99',
+            'typo3' => '9.5.0-10.4.99',
             'rdct' => '1.0.0',
         ],
         'conflicts' => [

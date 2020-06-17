@@ -22,6 +22,7 @@ use TYPO3\CMS\Core\Crypto\Random;
 use TYPO3\CMS\Core\Error\Http\ServiceUnavailableException;
 use TYPO3\CMS\Core\Exception\SiteNotFoundException;
 use TYPO3\CMS\Core\Http\ImmediateResponseException;
+use TYPO3\CMS\Core\Http\ServerRequestFactory;
 use TYPO3\CMS\Core\Imaging\Icon;
 use TYPO3\CMS\Core\Imaging\IconFactory;
 use TYPO3\CMS\Core\Messaging\FlashMessage;
@@ -1523,7 +1524,7 @@ class DirectMailUtility
             } else {
                 $GLOBALS['TSFE'] = GeneralUtility::makeInstance(TypoScriptFrontendController::class, $GLOBALS['TYPO3_CONF_VARS'], $pageId, 0);
             }
-            
+
 
             // for certain situations we need to trick TSFE into granting us
             // access to the page in any case to make getPageAndRootline() work
@@ -1533,8 +1534,13 @@ class DirectMailUtility
             $GLOBALS['TSFE']->gr_list = $pageRecord['fe_group'];
 
             $GLOBALS['TSFE']->sys_page = GeneralUtility::makeInstance(PageRepository::class);
-            $GLOBALS['TSFE']->getPageAndRootlineWithDomain($pageId);
 
+            if ($versionInformation->getMajorVersion() === 10) {
+                $request = $GLOBALS['TYPO3_REQUEST'] ?? ServerRequestFactory::fromGlobals();
+                $GLOBALS['TSFE']->getPageAndRootlineWithDomain($pageId, $request);
+            } else {
+                $GLOBALS['TSFE']->getPageAndRootlineWithDomain($pageId);
+            }
 
             // restore gr_list
             $GLOBALS['TSFE']->gr_list = $groupListBackup;
