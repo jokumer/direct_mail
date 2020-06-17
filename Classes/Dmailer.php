@@ -130,9 +130,9 @@ class Dmailer implements LoggerAwareInterface
      * @var MarkerBasedTemplateService
      */
     protected $templateService;
-    
+
     protected $message = '';
-    
+
     protected $notificationJob = false;
 
     protected function getCharsetConverter()
@@ -679,7 +679,7 @@ class Dmailer implements LoggerAwareInterface
             $mail->setTo($this->from_email, $from_name);
             $mail->setFrom($this->from_email, $from_name);
             $mail->setSubject($subject);
-            
+
             if ($this->replyto_email !== '') {
                 $mail->setReplyTo($this->replyto_email);
             }
@@ -1048,12 +1048,13 @@ class Dmailer implements LoggerAwareInterface
         // TODO: setContent should set the images (includeMedia) or add attachment
         $this->setContent($mailer);
 
-        if ($this->encoding == 'base64') {
-            $mailer->setEncoder(\Swift_Encoding::getBase64Encoding());
-        }
-
-        if ($this->encoding == '8bit') {
-            $mailer->setEncoder(\Swift_Encoding::get8BitEncoding());
+        if ($versionInformation->getMajorVersion() < 10) {
+            if ($this->encoding == 'base64') {
+                $mailer->setEncoder(\Swift_Encoding::getBase64Encoding());
+            }
+            if ($this->encoding == '8bit') {
+                $mailer->setEncoder(\Swift_Encoding::get8BitEncoding());
+            }
         }
 
         $mailer->send();
