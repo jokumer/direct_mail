@@ -990,21 +990,30 @@ class Dmailer implements LoggerAwareInterface
      */
     public function sendTheMail($recipient, $recipRow = null)
     {
+        if ($this->replyto_email) {
+            $replyTo = ['mail'=> $this->replyto_email, 'name' => $this->replyto_name];
+        } else {
+            $replyTo = ['mail'=> $this->from_email, 'name' => $this->from_name];
+        }
         /** @var MailMessage $mailer */
         $mailer = GeneralUtility::makeInstance(MailMessage::class);
-        $mailer->setFrom(array($this->from_email => $this->from_name));
-        $mailer->setSubject($this->subject);
+
+
         $versionInformation = GeneralUtility::makeInstance(\TYPO3\CMS\Core\Information\Typo3Version::class);
         if ($versionInformation->getMajorVersion() === 10) {
+            $mailer->from(new Address($this->from_email, $this->from_name));
+            $mailer->subject($this->subject);
             $mailer->priority($this->priority);
+            $mailer->replyTo(new Address($replyTo['mail'], $replyTo['name']));
+            // set the recipient
+            $mailer->to(new Address($recipient->getAddress(), $recipient->getName()));
         } else {
+            $mailer->setFrom(array($this->from_email => $this->from_name));
+            $mailer->setSubject($this->subject);
             $mailer->setPriority($this->priority);
-        }
-
-        if ($this->replyto_email) {
-            $mailer->setReplyTo(array($this->replyto_email => $this->replyto_name));
-        } else {
-            $mailer->setReplyTo(array($this->from_email => $this->from_name));
+            $mailer->setReplyTo(array($replyTo['mail'] => $replyTo['name']));
+            // set the recipient
+            $mailer->setTo($recipient);
         }
 
         // setting additional header
@@ -1037,13 +1046,6 @@ class Dmailer implements LoggerAwareInterface
             $mailer->setReturnPath($this->dmailer['sys_dmail_rec']['return_path']);
         }
 
-        // set the recipient
-        $versionInformation = GeneralUtility::makeInstance(\TYPO3\CMS\Core\Information\Typo3Version::class);
-        if ($versionInformation->getMajorVersion() === 10) {
-            $mailer->to($recipient);
-        } else {
-            $mailer->setTo($recipient);
-        }
 
         // TODO: setContent should set the images (includeMedia) or add attachment
         $this->setContent($mailer);
